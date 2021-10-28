@@ -1,0 +1,89 @@
+<html>
+<head>
+	<script src="https://preview.babylonjs.com/babylon.js"></script>
+	<script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+	<title>Test 01</title>
+	<style>
+		body,
+		#renderCanvas {
+			width: 100%;
+			height: 100%;
+			margin: 0; 
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="renderCanvas"></canvas>
+	<script>
+		const canvas = document.getElementById("renderCanvas");
+		const engine = new BABYLON.Engine(canvas, true);
+		const scene  = new BABYLON.Scene(engine);
+		const origin = new BABYLON.Vector3.Zero();
+		const x_axis = new BABYLON.Vector3(1, 0, 0);
+		const y_axis = new BABYLON.Vector3(0, 1, 0);
+		const z_axis = new BABYLON.Vector3(0, 0, 1);
+		const camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 4, Math.PI / 3, 8, origin, scene);
+		const light  = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, 10));
+		var box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
+
+		let box_material = new BABYLON.NodeMaterial("box_material", scene);
+		box_material.loadAsync("nm.json").then(() => {
+				console.log('before');
+				box_material.build(true);
+				console.log("after");
+		});
+		box.material = box_material;
+
+		/*
+		const LoadNodeMaterial = function(data, mesh) {
+			console.log('Loaded json data:', JSON.stringify(data));
+			console.log('Supplied mesh:', mesh);
+			console.log("Scene:", scene);
+			mesh.material = BABYLON.NodeMaterial.Parse(data, scene);
+			console.log('and now here!');
+		} 
+
+		fetch('./nm.json')
+				.then(response => response.json())
+				.then(data => LoadNodeMaterial(data, box))
+				.catch(error => {
+					console.error('Fetch of ./nm.json has failed.', error);
+				});
+		*/
+
+		const ElapsedTime = function () {
+			if (typeof ElapsedTime.start_time == 'undefined') {
+				ElapsedTime.start_time = new Date();
+			}
+			let end_time = new Date();
+			return (end_time - ElapsedTime.start_time) / 1000.0;
+		}
+
+		const InterframeElapsedTime = function () {
+			if (typeof InterframeElapsedTime.last_frame_time == 'undefined') {
+				InterframeElapsedTime.last_frame_time = ElapsedTime();
+			}
+			let now = ElapsedTime();
+			let delta_time = now - InterframeElapsedTime.last_frame_time;
+			InterframeElapsedTime.last_frame_time = now;
+			return delta_time;
+		}
+
+		const createScene = function () {
+			// This is run once.
+			scene.clearColor = new BABYLON.Color3.Black;
+			camera.attachControl(canvas, true);		
+			return scene;
+		};
+
+		const sceneToRender = createScene();
+		engine.runRenderLoop(function () {
+			let delta_time = InterframeElapsedTime();
+			box.rotate(y_axis, delta_time * Math.PI / 8.0, BABYLON.Space.Local)
+			sceneToRender.render();
+		});
+	</script>
+</body>
+
+</html>

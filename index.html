@@ -2,6 +2,8 @@
 <head>
 	<script src="https://preview.babylonjs.com/babylon.js"></script>
 	<script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+	<script src="https://preview.babylonjs.com/Oimo.js"></script>
+	<script src="./brick.js"></script>
 	<title>Test 01</title>
 	<style>
 		body,
@@ -23,34 +25,49 @@
 		const x_axis = new BABYLON.Vector3(1, 0, 0);
 		const y_axis = new BABYLON.Vector3(0, 1, 0);
 		const z_axis = new BABYLON.Vector3(0, 0, 1);
-		const camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 4, Math.PI / 3, 8, origin, scene);
+		const camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 4, Math.PI / 3, 18, origin, scene);
 		const light  = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, 10));
-		var box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
+		const sky_blue = new BABYLON.Color3(0.529, 0.808, 0.922);
 
+		var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+		var physicsPlugin = new BABYLON.OimoJSPlugin();
+		scene.enablePhysics(gravityVector, physicsPlugin);
+
+		window.addEventListener("resize", function () {
+				engine.resize();
+		});
+
+		scene.actionManager = new BABYLON.ActionManager(scene);
+		scene.registerAfterRender(animate);
+		scene.onKeyboardObservable.add((kbInfo) => {
+			switch (kbInfo.type) {
+				case BABYLON.KeyboardEventTypes.KEYDOWN:
+					switch (kbInfo.event.key) {
+						case ' ':
+							console.log('fire');
+							break;
+					}
+					break;
+			}
+		});
+
+		/* DO NOT DELETE THIS SNIPPET!!!
+		
+		var box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
 		let box_material = new BABYLON.NodeMaterial("box_material", scene);
 		box_material.loadAsync("nm.json").then(() => {
-				console.log('before');
 				box_material.build(true);
-				console.log("after");
 		});
 		box.material = box_material;
-
-		/*
-		const LoadNodeMaterial = function(data, mesh) {
-			console.log('Loaded json data:', JSON.stringify(data));
-			console.log('Supplied mesh:', mesh);
-			console.log("Scene:", scene);
-			mesh.material = BABYLON.NodeMaterial.Parse(data, scene);
-			console.log('and now here!');
-		} 
-
-		fetch('./nm.json')
-				.then(response => response.json())
-				.then(data => LoadNodeMaterial(data, box))
-				.catch(error => {
-					console.error('Fetch of ./nm.json has failed.', error);
-				});
 		*/
+
+		const b = new Brick(scene);
+		b.SetPosition(new BABYLON.Vector3(0, Brick.height / 2.0, 0));
+		const c = new Brick(scene);
+		c.SetPosition(new BABYLON.Vector3(4, Brick.height / 2.0, 4));
+
+		const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 20, height: 20 }, scene);
+		ground.physicsImposter = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0 }, scene);
 
 		const ElapsedTime = function () {
 			if (typeof ElapsedTime.start_time == 'undefined') {
@@ -72,17 +89,21 @@
 
 		const createScene = function () {
 			// This is run once.
-			scene.clearColor = new BABYLON.Color3.Black;
-			camera.attachControl(canvas, true);		
+			scene.clearColor = sky_blue;
+			camera.attachControl(canvas, true);
+			light.intensity = 0.8;	
 			return scene;
 		};
 
 		const sceneToRender = createScene();
 		engine.runRenderLoop(function () {
-			let delta_time = InterframeElapsedTime();
-			box.rotate(y_axis, delta_time * Math.PI / 8.0, BABYLON.Space.Local)
 			sceneToRender.render();
 		});
+
+		function animate() {
+			let delta_time = InterframeElapsedTime();
+		}
+
 	</script>
 </body>
 

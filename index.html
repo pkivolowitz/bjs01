@@ -7,7 +7,7 @@
 	<script src="./timer_functions.js"></script>
 	<script src="./brick.js"></script>
 	<script src="./skybox.js"></script>
-	<title>Test 01</title>
+	<title>63 Bricks (to match a Jenga Tower)</title>
 	<style>
 		body,
 		#renderCanvas {
@@ -26,8 +26,7 @@
 		var scene  = null;
 		var camera = null;
 		var light  = null;
-		var bricks = [];
-
+		var tower  = null;
 		window.addEventListener("DOMContentLoaded", async () => {
 			console.log('entered the DOM anonymous function');
 			canvas = document.getElementById("renderCanvas");
@@ -36,25 +35,16 @@
 
 			await Ammo();
 			scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin());
-			camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 4, Math.PI / 3, 36, origin, scene);
+			camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 3, Math.PI / 2.5, 70, new BABYLON.Vector3(0, 15, 0), scene);
 			light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, 10));
 
 			RegisterWindowCallbacks();
 			RegisterSceneCallbacks();
 			RegisterKeyboardCallbacks();
 			
-			bricks.push(new Brick(scene));
-			bricks[0].SetPosition(new BABYLON.Vector3(0, Brick.height / 2.0, 0));
-			bricks.push(new Brick(scene));
-			bricks[1].SetPosition(new BABYLON.Vector3(2, Brick.height / 2.0, 2));
-			bricks.push(new Brick(scene));
-			bricks[2].SetPosition(new BABYLON.Vector3(-2, Brick.height / 2.0, 2));
-			bricks.push(new Brick(scene));
-			bricks[3].SetPosition(new BABYLON.Vector3(2, Brick.height / 2.0, -2));
-			bricks.push(new Brick(scene));
-			bricks[4].SetPosition(new BABYLON.Vector3(-2, Brick.height / 2.0, -2));
+			tower = new Tower();
 
-			const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 60, height: 60, subdivisions: 10 }, scene);
+			const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 600, height: 600, subdivisions: 60 }, scene);
 			ground.renderingGroupId = 1;
 			var mapMaterial = new BABYLON.StandardMaterial("mm", scene);
 			mapMaterial.wireframe = true;
@@ -101,12 +91,11 @@
 		*/
 
 
-
 		const createScene = function () {
 			// This is run once.
 			scene.clearColor = sky_blue;
 			camera.attachControl(canvas, true);
-			light.intensity = 0.8;	
+			light.intensity = 0.8;
 			return scene;
 		};
 

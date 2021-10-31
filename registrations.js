@@ -17,8 +17,8 @@ function RegisterKeyboardCallbacks() {
 				switch (kbInfo.event.key) {
 					case ' ':
 						console.log('fire');
-						if (bricks.length > 0) {
-							bricks.forEach(b => Zap(b));
+						if (Tower.bricks.length > 0) {
+							Tower.bricks.forEach(b => Zap(b));
 						} else {
 							console.log('bricks vector is empty');
 						}

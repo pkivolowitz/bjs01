@@ -49,7 +49,7 @@
 			var mapMaterial = new BABYLON.StandardMaterial("mm", scene);
 			mapMaterial.wireframe = true;
 			ground.material = mapMaterial;
-			ground.physicsImposter = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0, friction: 0.9 }, scene);
+			ground.physicsImposter = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0, friction: 1 }, scene);
 
 			const sceneToRender = createScene();
 			CreateSkybox();

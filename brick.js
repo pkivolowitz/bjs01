@@ -19,7 +19,7 @@ class Brick {
 		this.brick.renderingGroupId = 1;
 		this.brick.material = Brick.wood;
 		this.brick.physicsImposter = new BABYLON.PhysicsImpostor(this.brick, BABYLON.PhysicsImpostor.BoxImpostor, 
-			{ disableBidirectionalTransformation: false, mass: v, restitution: 0.0, friction: 3 }, scene);
+			{ disableBidirectionalTransformation: false, mass: v, restitution: 0.0, friction: 90 }, scene);
 		Brick.brick_counter += 1;
 	}
 

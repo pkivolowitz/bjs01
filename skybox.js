@@ -1,8 +1,8 @@
 ;
 
 function CreateSkybox(scene) {
-	var skybox = BABYLON.Mesh.CreateBox("skyBox", 100.0, scene);
-	var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+	skybox = BABYLON.Mesh.CreateBox("skyBox", 100.0, scene);
+	skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
 	skyboxMaterial.backFaceCulling = false;
 	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
 	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;

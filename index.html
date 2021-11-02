@@ -27,6 +27,12 @@
 		var camera = null;
 		var light  = null;
 		var tower  = null;
+		var ground = null;
+		var skyBox = null;
+		var skyBoxMaterial = null;
+		var startingPoint;
+		var currentMesh;
+
 		window.addEventListener("DOMContentLoaded", async () => {
 			console.log('entered the DOM anonymous function');
 			canvas = document.getElementById("renderCanvas");
@@ -34,8 +40,8 @@
 			scene = new BABYLON.Scene(engine);
 
 			await Ammo();
-			scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), new BABYLON.AmmoJSPlugin());
-			camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 3, Math.PI / 2.5, 70, new BABYLON.Vector3(0, 15, 0), scene);
+			scene.enablePhysics(new BABYLON.Vector3(0, -9.81 * 1, 0), new BABYLON.AmmoJSPlugin());
+			camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 3, Math.PI / 2.5, 50, new BABYLON.Vector3(0, 15, 0), scene);
 			light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, 10));
 
 			RegisterWindowCallbacks();
@@ -44,16 +50,35 @@
 			
 			tower = new Tower();
 
-			const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 600, height: 600, subdivisions: 60 }, scene);
+			ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 600, height: 600, subdivisions: 60 }, scene);
 			ground.renderingGroupId = 1;
 			var mapMaterial = new BABYLON.StandardMaterial("mm", scene);
-			mapMaterial.wireframe = true;
+			//mapMaterial.wireframe = true;
 			ground.material = mapMaterial;
-			ground.physicsImposter = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0, friction: 1 }, scene);
+			ground.physicsImposter = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.0, friction: 10 }, scene);
 
 			const sceneToRender = createScene();
 			CreateSkybox();
 
+			scene.onPointerObservable.add((pointerInfo) => {
+			switch (pointerInfo.type) {
+				case BABYLON.PointerEventTypes.POINTERDOWN:
+					if (pointerInfo.pickInfo.hit && (pointerInfo.pickInfo.pickedMesh != skyBox)) {
+						//console.log('POINTERDOWN', pointerInfo.pickInfo.pickedMesh.id);
+						pointerDown(pointerInfo.pickInfo.pickedMesh)
+					}
+					break;
+				case BABYLON.PointerEventTypes.POINTERUP:
+					//console.log('POINTERUP');
+					pointerUp();
+					break;
+				case BABYLON.PointerEventTypes.POINTERMOVE:
+					//console.log('POINTERMOVE');
+					pointerMove();
+					break;
+			}
+			});
+			//scene.getPhysicsEngine().setTimeStep(1 / 20);
 			engine.runRenderLoop(function () {
 				sceneToRender.render();
 			});
